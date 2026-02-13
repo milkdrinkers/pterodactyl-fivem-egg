@@ -1,7 +1,7 @@
 <div align="center">
   <h1>FiveM/RedM Server Egg</h1>
 
-  *A modified Pterodactyl egg for [FiveM](https://fivem.net/) & [RedM](https://redm.net/) which includes features like updating server artifacts and cloning/pulling server files from git.*
+  *A Pterodactyl egg for [FiveM](https://fivem.net/) & [RedM](https://redm.net/) which includes features like updating server artifacts and cloning/pulling server files from git.*
 
 <br>
 <div>
