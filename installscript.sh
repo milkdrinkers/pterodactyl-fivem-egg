@@ -8,35 +8,35 @@ apt install -y tar xz-utils curl git file jq unzip
 mkdir -p /mnt/server
 cd /mnt/server
 
-RELEASE_PAGE=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/?$RANDOM)
+RELEASE_PAGE=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
+CHANGELOGS_PAGE=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
 
 # Check wether to run installation or update version of script
 if [ ! -d "./alpine/" ] && [ ! -d "./resources/" ]; then
   # Install script
   echo "Beginning installation of new FiveM server."
 
-  # Grab download link from FIVEM_VERSION
-  if [ "${FIVEM_VERSION}" == "latest" ] || [ -z ${FIVEM_VERSION} ] ; then
-    # Grab latest optional artifact if version requested is latest or null
-    LATEST_ARTIFACT=$(echo -e "${RELEASE_PAGE}" | grep "LATEST OPTIONAL" -B1 | grep -Eo 'href=".*/*.tar.xz"' | grep -Eo '".*"' | sed 's/\"//g' | sed 's/\.\///1')
-    DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${LATEST_ARTIFACT})
+  if [[ "${FIVEM_VERSION}" == "recommended" ]] || [[ -z ${FIVEM_VERSION} ]]; then
+    DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
+  elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
+    DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.latest_download')
   else
-    # Grab specific artifact if it exists
-    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo 'href=".*/*.tar.xz"' | grep -Eo '".*"' | sed 's/\"//g' | sed 's/\.\///1' | grep ${FIVEM_VERSION})
-    if [ "${VERSION_LINK}" == "" ]; then
-      echo -e "Defaulting to directly downloading artifact as the version requested was not found on page."
+    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g'  | sed 's/\.\///1' | grep -i "${FIVEM_VERSION}" | grep -o =.* |  tr -d '=')
+    if [[ "${VERSION_LINK}" == "" ]]; then
+      echo -e "Defaulting to recommended as the version requested was invalid."
+      DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
     else
-      DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)
+      DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${VERSION_LINK})
     fi
   fi
 
   # Download artifact and get filetype
   echo -e "Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}..."
   curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}
-  echo "Extracting FiveM artifact files..."
-  FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)
-
+  
   # Unpack artifact depending on filetype
+  echo "Extracting FiveM/RedM FXServer artifact files..."
+  FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)
   if [ "$FILETYPE" == "gzip" ]; then
     tar xzvf ${DOWNLOAD_LINK##*/}
   elif [ "$FILETYPE" == "Zip" ]; then
@@ -97,40 +97,39 @@ if [ ! -d "./alpine/" ] && [ ! -d "./resources/" ]; then
 
 else
   # Update script
-  echo "Beginning update of existing FiveM server artifact."
+  echo "Beginning update of existing FiveM/RedM FXServer server artifact."
 
   # Delete old artifact
   if [ -d "./alpine/" ]; then
-    echo "Deleting old artifact..."
+    echo "Deleting old FXServer artifact..."
     rm -r ./alpine/
     while [ -d "./alpine/" ]; do
       sleep 1s
     done
-    echo "Deleted old artifact files successfully."
+    echo "Deleted old FXServer artifact files successfully."
   fi
 
-  # Grab download link from FIVEM_VERSION
-  if [ "${FIVEM_VERSION}" == "latest" ] || [ -z ${FIVEM_VERSION} ] ; then
-    # Grab latest optional artifact if version requested is latest or null
-    LATEST_ARTIFACT=$(echo -e "${RELEASE_PAGE}" | grep "LATEST OPTIONAL" -B1 | grep -Eo 'href=".*/*.tar.xz"' | grep -Eo '".*"' | sed 's/\"//g' | sed 's/\.\///1')
-    DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${LATEST_ARTIFACT})
+  if [[ "${FIVEM_VERSION}" == "recommended" ]] || [[ -z ${FIVEM_VERSION} ]]; then
+    DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
+  elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
+    DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.latest_download')
   else
-    # Grab specific artifact if it exists
-    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo 'href=".*/*.tar.xz"' | grep -Eo '".*"' | sed 's/\"//g' | sed 's/\.\///1' | grep ${FIVEM_VERSION})
-    if [ "${VERSION_LINK}" == "" ]; then
-      echo -e "Defaulting to directly downloading artifact as the version requested was not found on page."
+    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g'  | sed 's/\.\///1' | grep -i "${FIVEM_VERSION}" | grep -o =.* |  tr -d '=')
+    if [[ "${VERSION_LINK}" == "" ]]; then
+      echo -e "Defaulting to recommended as the version requested was invalid."
+      DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
     else
-      DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FIVEM_VERSION}/fx.tar.xz)
+      DOWNLOAD_LINK=$(echo https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${VERSION_LINK})
     fi
   fi
 
   # Download artifact and get filetype
   echo -e "Running curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}..."
   curl -sSL ${DOWNLOAD_LINK} -o ${DOWNLOAD_LINK##*/}
-  echo "Extracting FiveM artifact files..."
-  FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)
 
   # Unpack artifact depending on filetype
+  echo "Extracting FiveM/RedM FXServer artifact files..."
+  FILETYPE=$(file -F ',' ${DOWNLOAD_LINK##*/} | cut -d',' -f2 | cut -d' ' -f2)
   if [ "$FILETYPE" == "gzip" ]; then
     tar xzvf ${DOWNLOAD_LINK##*/}
   elif [ "$FILETYPE" == "Zip" ]; then
