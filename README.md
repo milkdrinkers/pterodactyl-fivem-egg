@@ -45,10 +45,15 @@ Will I help you set this up? No. However if you have any questions I'm usually a
 
 ### Updating Server Artifact
 
-If you want to update your servers artifact I've provided an easy way for doing so. This will completely delete the `alpine` folder and replace it with the specified or latest optional version.
+If you want to update your servers artifact I've provided an easy way for doing so. (*This will delete the existing `/alpine/` directory and replace it with the newly downloaded one.*)
 
-1. On your servers `Startup` page, set `FiveM Version` to the version you want to update to. Optionally, leave this blank or set it to `latest` to download the latest optional build.
-2. On your servers `Settings` page, click `Reinstall Server` and confirm. Then simply wait for it to download the new artifact.
+1. On your servers `Startup` page, set the `FXServer Version` to the version you want to update to.
+
+    The valid versions are:
+    - `latest` - (*Default*) *Downloads the latest available artifact.*
+    - `recommended` - *Downloads the recommended artifact.*
+    - any version number like `25770` or `1383-e5ea040353ce1b8bc86e37982bf5d888938e3096` - *Downloads the specific artifact.*
+1. On your servers `Settings` page, click `Reinstall Server` and confirm. Then simply wait for it to download the new server artifact.
 
 ### Auto Updating Server from Git
 
@@ -56,28 +61,12 @@ Listed below is the behavior of Git when it's enabled.
 
 #### Startup Scenarios (On server start)
 
-* If the `resources` folder is empty. The specified repository will be cloned into `resources` on startup.
-* If the `resources` folder has a git repository inside it. It will run a git pull in `resources` on startup.
+- If the `resources` folder is empty. The specified repository will be cloned into `resources` on startup.
+- If the `resources` folder has a git repository inside it. It will run a git pull in `resources` on startup.
 
 #### Reinstall Scenarios (If the `Reinstall Server` button is pressed)
 
-* If the `resources` folder does not exist. The folder will be created and the specified repository will be cloned into `resources` on startup.
-
-### TxAdmin
-
-TxAdmin can be enabled by setting `TXADMIN_ENABLED` to `1`. Keep in mind you need to set `TXADMIN_PORT` as well.
-
-#### Your server will not go online until it's started from TxAdmin
-
-While TxAdmin is a wonderful piece of software I don't understand the purpose of hosting a server on a panel only to use another panel for managing said server. If you want to use TxAdmin I'd recommend staying on [Parkervcp](https://github.com/parkervcp)'s egg since most additional *features*  in this egg are redundant when running TxAdmin.
-
-### Updating The Server
-
-The `FIVEM_VERSION` variable.
-
-- Defaults to `latest` which is the latest optional artifact.
-- Can be set to a specific version Ex. `2431-350dd7bd5c0176216c38625ad5b1108ead44674d`.
-- If the `Reinstall Server` button is pressed the `alpine` folder will be replaced with an updated version.
+- If the `resources` folder does not exist. The folder will be created and the specified repository will be cloned into `resources` on startup.
 
 ---
 
@@ -85,10 +74,10 @@ The `FIVEM_VERSION` variable.
 
 Ports required to run the server in a table format. You only need the TxAdmin port if you plan to enable TxAdmin.
 
-| Port | default |
+| Type | Port |
 | - | - |
 | Game | 30120 |
-| txAdmin | 40120 |
+| txAdmin | 40120 (*Optional*) |
 
 ## ❤️ Acknowledgments
 
