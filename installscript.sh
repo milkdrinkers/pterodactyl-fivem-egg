@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 # FiveM Installation Script
 #
 # Server Files: /mnt/server
