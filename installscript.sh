@@ -21,7 +21,7 @@ if [ ! -d "./alpine/" ] && [ ! -d "./resources/" ]; then
   elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
     DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.latest_download')
   else
-    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g'  | sed 's/\.\///1' | grep -i "${FIVEM_VERSION}" | grep -o =.* |  tr -d '=')
+    VERSION_LINK=$(echo "${RELEASE_PAGE}" | grep -Eo "[0-9]+-[0-9a-f]{40}/fx\.tar\.xz" | grep -i "^${FIVEM_VERSION}" | head -1)
     if [[ "${VERSION_LINK}" == "" ]]; then
       echo -e "Defaulting to recommended as the version requested was invalid."
       DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
@@ -114,7 +114,7 @@ else
   elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
     DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.latest_download')
   else
-    VERSION_LINK=$(echo -e "${RELEASE_PAGE}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g'  | sed 's/\.\///1' | grep -i "${FIVEM_VERSION}" | grep -o =.* |  tr -d '=')
+    VERSION_LINK=$(echo "${RELEASE_PAGE}" | grep -Eo "[0-9]+-[0-9a-f]{40}/fx\.tar\.xz" | grep -i "^${FIVEM_VERSION}" | head -1)
     if [[ "${VERSION_LINK}" == "" ]]; then
       echo -e "Defaulting to recommended as the version requested was invalid."
       DOWNLOAD_LINK=$(echo $CHANGELOGS_PAGE | jq -r '.recommended_download')
